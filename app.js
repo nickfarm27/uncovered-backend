@@ -1,8 +1,10 @@
+import 'dotenv/config'
 import express from "express";
 import cors from "cors";
 import axios from "axios";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+
+// import userRoutes from "./routes/users.js";
+import postRoutes from "./routes/posts.js";
 
 const app = express();
 
@@ -11,54 +13,23 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const router = express.Router();
+// app.use("/user", userRoutes);
+app.use("/post", postRoutes)
 
-app.get("/", (req, res) => {
-    res.send("HI");
-});
-
-// Initialize Cloud Firestore through Firebase
-const firebaseApp = initializeApp({
-    apiKey: "AIzaSyCBpF5RQn_G3xXxaCm87jbdvK82zHnlkBI",
-    authDomain: "uncovered-fa94a.firebaseapp.com",
-    projectId: "uncovered-fa94a",
-});
-
-const db = getFirestore();
-
-// const querySnapshot = await getDocs(collection(db, "Users"));
-// querySnapshot.forEach((doc) => {
-//   console.log(`${doc.id} => ${doc.data()}`);
+// app.get("/", (req, res) => {
+//     res.send("HI");
 // });
 
-app.post("/twitter", (req, res) => {
-    const url = req.body.url;
-    const tweetId = url.split("/").pop();
-    console.log(tweetId);
+// axios.post('http://localhost:3030/post', {
+//     url: "https://twitter.com/TheRock/status/1489222081745080320"
+//   })
+//   .then(function (response) {
+//     // console.log(response);
+//   })
+//   .catch(function (error) {
+//     // console.log(error);
+//   });
 
-    const config = {
-        headers: {
-            Authorization: `Bearer AAAAAAAAAAAAAAAAAAAAACHxVwEAAAAAfkN1tlucuoTmdMoulsJFxXYqsdg%3DUQgc60spBW9F0Rnydd0FKF1GPGFUM4Fm1i1oWbT9id6IsAWczU`,
-        },
-    };
-
-    axios
-        .get(
-            `https://api.twitter.com/2/tweets/${tweetId}?expansions=author_id&tweet.fields=created_at&user.fields=created_at`,
-            config
-        )
-        .then(function (response) {
-            // handle success
-            console.log(response.data);
-            const tweetData = response.data;
-            res.send(tweetData);
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        });
-});
-
-app.listen(3001, () => {
-    console.log("starting server on 3001");
+app.listen(3030, () => {
+    console.log("starting server on 3030");
 });
