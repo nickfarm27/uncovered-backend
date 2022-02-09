@@ -2,10 +2,10 @@ import 'dotenv/config'
 import express from "express";
 import cors from "cors";
 import axios from "axios";
-
 // import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 
+const PORT = process.env.PORT || 3030;
 const app = express();
 
 app.use(cors());
@@ -15,10 +15,6 @@ app.use(express.json());
 
 // app.use("/user", userRoutes);
 app.use("/post", postRoutes)
-
-// app.get("/", (req, res) => {
-//     res.send("HI");
-// });
 
 // axios.post('http://localhost:3030/post', {
 //     url: "https://twitter.com/TheRock/status/1489222081745080320"
@@ -30,6 +26,6 @@ app.use("/post", postRoutes)
 //     // console.log(error);
 //   });
 
-app.listen(3030, () => {
-    console.log("starting server on 3030");
+app.listen(PORT, () => {
+    console.log(`starting server on ${PORT}`);
 });

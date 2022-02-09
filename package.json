@@ -14,7 +14,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
-    "firebase": "^9.5.0",
+    "firebase": "^9.6.6",
     "tsjs-xpx-chain-sdk": "^0.9.1"
   }
 }
