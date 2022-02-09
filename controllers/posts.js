@@ -48,6 +48,23 @@ export const getUnverifiedPosts = async (req, res) => {
     }
 };
 
+export const getSinglePost = async (req, res) => {
+    const id = req.body.id;
+
+    try {
+        const postRef = doc(db, "posts", id);
+        const docSnap = await getDoc(postRef);
+
+        if (docSnap.exists()) {
+            res.json({data: docSnap.data()})
+        } else {
+            res.json({message: "No document found"})
+        }
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
 export const createPost = async (req, res) => {
     const url = req.body.url;
     const tweetId = url.split("/").pop();
