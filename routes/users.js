@@ -1,9 +1,9 @@
-// import express from 'express';
+import express from 'express';
 
-// import { createUser } from '../controllers/users.js';
+import { createPrivateKey } from '../controllers/users.js';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post('/', createUser);
+router.get('/', createPrivateKey);
 
-// export default router;
+export default router;

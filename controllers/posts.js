@@ -88,14 +88,14 @@ export const createPost = async (req, res) => {
             //? get post from twitter
             try {
                 const response = await axios.get(
-                    `https://api.twitter.com/2/tweets/${tweetId}?expansions=author_id&tweet.fields=created_at&user.fields=created_at`,
+                    `https://api.twitter.com/2/tweets/${tweetId}?expansions=author_id&tweet.fields=created_at&user.fields=profile_image_url`,
                     config
                 );
                 const tweetData = response.data;
 
                 if (tweetData.data) {
                     const { id, text, created_at, author_id } = tweetData.data;
-                    const { name, username } = tweetData.includes.users[0];
+                    const { name, username, profile_image_url } = tweetData.includes.users[0];
                     const data = {
                         tweet_id: id,
                         text: text,
@@ -104,6 +104,7 @@ export const createPost = async (req, res) => {
                         author_name: name,
                         author_username: username,
                         verified: false,
+                        author_profile_image_url: profile_image_url
                     };
                     try {
                         await setDoc(postRef, data);
