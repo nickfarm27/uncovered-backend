@@ -49,7 +49,7 @@ export const getUnverifiedPosts = async (req, res) => {
 };
 
 export const getSinglePost = async (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
 
     try {
         const postRef = doc(db, "posts", id);
