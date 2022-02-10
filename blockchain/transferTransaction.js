@@ -1,18 +1,19 @@
-import { TransferTransaction, Deadline, Account, NetworkType, PlainMessage, NetworkCurrencyMosaic, TransactionHttp } from 'tsjs-xpx-chain-sdk';
+import { TransferTransaction, Deadline, Account, NetworkType, PlainMessage, NetworkCurrencyMosaic, TransactionHttp, PublicAccount } from 'tsjs-xpx-chain-sdk';
 
 const sender = Account.createFromPrivateKey(
+    // '795C61F2C5DCAD347F3B42FA1185B32162D8064B3FDBCEB2D081FD813516F9EC',
     'CE70B1BF3667249C877E6D2C64250D17AEBD8FE7D5CC0C5F29CEF9580474DBB9',
     NetworkType.TEST_NET);
-    
-    const recipient = Account.createFromPrivateKey(
-        '795C61F2C5DCAD347F3B42FA1185B32162D8064B3FDBCEB2D081FD813516F9EC',
-    NetworkType.TEST_NET).publicAccount;
+
+const recipient = Account.createFromPrivateKey(
+    '795C61F2C5DCAD347F3B42FA1185B32162D8064B3FDBCEB2D081FD813516F9EC',
+NetworkType.TEST_NET).publicAccount;
 
 const tx = TransferTransaction.create(
     Deadline.create(),
     recipient.address,
-    [NetworkCurrencyMosaic.createRelative(1249)],
-    PlainMessage.create('Can i store info in here?'),
+    [NetworkCurrencyMosaic.createRelative(1)],
+    PlainMessage.create('Send to myself can?'),
     NetworkType.TEST_NET
 );
 
