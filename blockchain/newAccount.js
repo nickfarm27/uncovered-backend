@@ -12,6 +12,8 @@ export const generateNewAccount = () => {
     return newAccount.privateKey;
 };
 
+// generateNewAccount()
+
 const generateAddressFromPublicKey = () => {
     const publicKey = 'E05B9C0F9BABB57635F8786ACE7DF9392F792ADE259F4709FE5E62DF85CFA4E9';
 

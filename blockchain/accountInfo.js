@@ -10,12 +10,12 @@ const getAccountInfoForAnAccount = () => {
     const address = Address.createFromRawAddress('VAX5ZG2HTXXOOOIHY72BARK5L66XF46BOQWENU5Q');
 
     return accountHttp.getAccountInfo(address).subscribe(accountInfo => {
-        return accountInfo.mosaics[0].amount.compact();
+        console.log(accountInfo.mosaics[0].id)
     }, error => {
         console.error(error);
     });
 }
-console.log(getAccountInfoForAnAccount())
+getAccountInfoForAnAccount()
 
 const getAccountsInfoForDifferentAccounts = () => {
     const address1 = Address.createFromPublicKey('73472A2E9DCEA5C2A36EB7F6A34A634010391EC89E883D67360DB16F28B9443C', NETWORK_TYPE);
