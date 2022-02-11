@@ -104,8 +104,15 @@ export const createPost = async (req, res) => {
                         author_name: name,
                         author_username: username,
                         verified: false,
-                        author_profile_image_url: profile_image_url
+                        author_profile_image_url: profile_image_url,
+                        user_vote_real: 0,
+                        user_vote_fake: 0,
+                        investigator_info: [],
+                        jury_info: [],
                     };
+
+                    // TODO: add author data - if present, just add post, if not, add new author data
+
                     try {
                         await setDoc(postRef, data);
                         res.json({ data: data });
