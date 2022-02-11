@@ -2,7 +2,7 @@ import { AccountHttp, NetworkType, PlainMessage, PublicAccount, UInt64 } from "t
 
 const accountHttp = new AccountHttp('http://bctestnet3.brimstone.xpxsirius.io:3000');
 
-const publicKey = 'E8942D87C9EC276AFB61F925672AF2089768F351C2EB4E87425E926870A0874E';
+const publicKey = '76F4540F5CC7D8B6E7B7A680A2D51AA2306A0112CB14B7BFCA25FB3EA2F0F8B3';
 const publicAccount =  PublicAccount.createFromPublicKey(publicKey, NetworkType.TEST_NET);
 
 accountHttp.transactions(publicAccount).subscribe(tx => {

@@ -4,10 +4,10 @@ import { generateKeys, getAccountInfo, getAllTransactions, getBlockTransactionIn
 const router = express.Router();
 
 router.get('/', generateKeys)
-router.get('/account', getAccountInfo)
-router.get('/transactions', getAllTransactions)
+router.get('/account/:address', getAccountInfo)
+router.get('/transactions/:publicKey', getAllTransactions)
 router.post('/transfer', transferCoins)
 router.post('/upload', uploadDataToBlockchain)
-router.get('/block', getBlockTransactionInfo)
+router.get('/block/:height', getBlockTransactionInfo)
 
 export default router;

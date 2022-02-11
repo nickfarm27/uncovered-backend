@@ -44,7 +44,7 @@ export const generateKeys = (req, res) => {
 
 // VAX5ZG-2HTXXO-OOIHY7-2BARK5-L66XF4-6BOQWE-NU5Q
 export const getAccountInfo = (req, res) => {
-    const addressString = req.body.address;
+    const addressString = req.params.address;
     const API_URL = "https://bctestnet3.brimstone.xpxsirius.io/";
     const accountHttp = new AccountHttp(API_URL);
     const address = Address.createFromRawAddress(addressString);
@@ -71,7 +71,7 @@ export const getAccountInfo = (req, res) => {
 
 export const getAllTransactions = (req, res) => {
     // TODO change this to public key
-    const publicKey = req.body.publicKey;
+    const publicKey = req.params.publicKey;
     const accountHttp = new AccountHttp(
         "http://bctestnet3.brimstone.xpxsirius.io:3000"
     );
@@ -196,7 +196,7 @@ export const uploadDataToBlockchain = (req, res) => {
 
 // TODO: get block transaction info
 export const getBlockTransactionInfo = (req, res) => {
-    const height = Number(req.body.height);
+    const height = Number(req.params.height);
     const blockHttp = new BlockHttp(
         "http://bctestnet3.brimstone.xpxsirius.io:3000"
     );
