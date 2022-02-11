@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { generateKeys } from "../utils/blockchain.js";
 
@@ -24,9 +24,7 @@ export const createNewUser = async (req, res) => {
     const username = req.body.username
     const uid = req.body.uid
 
-    console.log(email, username, uid);
-
-    const userRef = doc(db, "users", String(uid))
+    const userRef = doc(db, "users", uid)
     const { privateKey, publicKey, address } = generateKeys()
 
     const data = {
@@ -34,7 +32,7 @@ export const createNewUser = async (req, res) => {
         username: username,
         email: email,
         role: "NORMAL",
-        userRating: 0,
+        userRatings: [5],
         experiencePoints: 0,
         numberOfVerifiedNews: 0,
         savedPosts: [],
@@ -47,8 +45,63 @@ export const createNewUser = async (req, res) => {
 
     try {
         await setDoc(userRef, data)
-        console.log("NOT WORKING??");
         res.json({user: data})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
+export const upgradeToInvestigator = async (req, res) => {
+    const uid = req.body.uid
+    const invClass = req.body.class
+
+    const userRef = doc(db, "users", uid)
+    try {
+        await updateDoc(userRef, {
+            class: invClass,
+            role: "INVESTIGATOR"
+        })
+        res.json({message: "UPDATE SUCCESS"})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
+export const upgradeToJury = async (req, res) => {
+    const uid = req.body.uid
+    const userRef = doc(db, "users", uid)
+
+    try {
+        await updateDoc(userRef, {
+            role: "JURY"
+        })
+        res.json({message: "UPDATE SUCCESS"})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
+export const rateUser = async (req, res) => {
+    const investigatorId = req.body.uid
+    const rating = Number(req.body.rating)
+    
+    const userRef = doc(db, "users", investigatorId)
+    let userRatings = []
+
+    try {
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+            userRatings = docSnap.data().userRatings
+        }
+        try {
+            await updateDoc(userRef, {
+                userRatings: [...userRatings, rating]
+            })
+            res.json({message: "UPDATE SUCCESS"})
+        } catch (error) {
+            res.json({error: error})
+        }
     } catch (error) {
         res.json({error: error})
     }

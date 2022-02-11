@@ -1,11 +1,14 @@
 import axios from "axios";
 import {
+    arrayUnion,
     collection,
     doc,
     getDoc,
     getDocs,
+    increment,
     query,
     setDoc,
+    updateDoc,
     where,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
@@ -66,6 +69,7 @@ export const getSinglePost = async (req, res) => {
 }
 
 export const createPost = async (req, res) => {
+    const uid = req.body.uid
     const url = req.body.url;
     const tweetId = url.split("/").pop();
 
@@ -79,9 +83,13 @@ export const createPost = async (req, res) => {
     try {
         const postRef = doc(db, "posts", tweetId);
         const docSnap = await getDoc(postRef);
+        const userRef = doc(db, "users", uid)
 
         if (docSnap.exists()) {
             console.log("Document data:", docSnap.data());
+            await updateDoc(postRef, {
+                user_uploads: arrayUnion(uid)
+            })
             res.json({ data: docSnap.data() });
         } else {
             //* doc.data() will be undefined in this case
@@ -105,10 +113,11 @@ export const createPost = async (req, res) => {
                         author_username: username,
                         verified: false,
                         author_profile_image_url: profile_image_url,
-                        user_vote_real: 0,
-                        user_vote_fake: 0,
+                        user_vote_real: [],
+                        user_vote_fake: [],
                         investigator_info: [],
                         jury_info: [],
+                        user_uploads: [uid],
                     };
 
                     // TODO: add author data - if present, just add post, if not, add new author data
@@ -130,3 +139,76 @@ export const createPost = async (req, res) => {
         res.json({ type: "Firebase Error", error: error });
     }
 };
+
+export const addInvestigatorResearch = async (req, res) => {
+    const { pid, uid, userRating, researchText, vote } = req.body
+    const postRef = doc(db, "posts", pid)
+    const userRef = doc(db, "users", uid)
+
+    try {
+        await updateDoc(postRef, {
+            investigator_info: arrayUnion({
+                uid: uid,
+                userRating: Number(userRating),
+                researchText: researchText,
+                vote: (vote === "true")
+            })
+        })
+        await updateDoc(userRef, {
+            numberOfVerifiedNews: increment(1)
+        })
+        res.json({message: "ADDED INVESTIGATOR RESEARCH TO DATABASE"})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
+export const addJuryReview = async (req, res) => {
+    const { pid, uid, userRating, researchText, grade } = req.body
+    const newGrade = Number(grade) * 2 - 100
+
+    const postRef = doc(db, "posts", pid)
+    const userRef = doc(db, "users", uid)
+
+    try {
+        await updateDoc(postRef, {
+            jury_info: arrayUnion({
+                uid: uid,
+                userRating: Number(userRating),
+                researchText: researchText,
+                grade: newGrade,
+                ratingDone: false,
+            })
+        })
+        await updateDoc(userRef, {
+            numberOfVerifiedNews: increment(1)
+        })
+        res.json({message: "ADDED JURY REVIEW TO DATABASE"})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
+export const addUserVote = async (req, res) => {
+    const { pid, uid, vote } = req.body
+    const voteType = (vote === "true")
+    console.log(voteType);
+
+    const postRef = doc(db, "posts", pid)
+    try {
+        if (voteType) {
+            await updateDoc(postRef, {
+                user_vote_real: arrayUnion(uid)
+            })
+            console.log("VOTED true");
+        } else {
+            await updateDoc(postRef, {
+                user_vote_fake: arrayUnion(uid)
+            })
+            console.log("VOTED false");
+        }
+        res.json({message: `VOTED ${vote} for the post`})
+    } catch (error) {
+        res.json({error: error})
+    }
+}
