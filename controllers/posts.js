@@ -155,7 +155,7 @@ export const addInvestigatorResearch = async (req, res) => {
                 username: username,
                 userRating: Number(userRating),
                 researchText: researchText,
-                vote: (vote === "true")
+                vote: vote
             })
         })
         await updateDoc(userRef, {
@@ -168,7 +168,7 @@ export const addInvestigatorResearch = async (req, res) => {
 }
 
 export const addJuryReview = async (req, res) => {
-    const { pid, uid, username, userRating, researchText, grade } = req.body
+    const { pid, uid, username, userRating, researchText, grade, juryCount } = req.body
     const newGrade = Number(grade) * 2 - 100
 
     const postRef = doc(db, "posts", pid)
@@ -184,11 +184,18 @@ export const addJuryReview = async (req, res) => {
                 researchText: researchText,
                 grade: newGrade,
                 ratingDone: false,
-            })
+            }),
+            verified: (Number(juryCount) === 4)
         })
         await updateDoc(userRef, {
             numberOfVerifiedNews: increment(1)
         })
+        if (Number(juryCount) === 4) {
+            // TODO: calculate trust index
+
+
+            // TODO: update author's info
+        }
         res.json({message: "ADDED JURY REVIEW TO DATABASE"})
     } catch (error) {
         res.json({error: error})
@@ -205,12 +212,10 @@ export const addUserVote = async (req, res) => {
             await updateDoc(postRef, {
                 user_vote_real: arrayUnion(uid)
             })
-            console.log("VOTED true");
         } else {
             await updateDoc(postRef, {
                 user_vote_fake: arrayUnion(uid)
             })
-            console.log("VOTED false");
         }
         res.json({message: `VOTED ${vote} for the post`})
     } catch (error) {

@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { generateKeys } from "../utils/blockchain.js";
 
@@ -84,24 +84,13 @@ export const upgradeToJury = async (req, res) => {
 export const rateUser = async (req, res) => {
     const investigatorId = req.body.uid
     const rating = Number(req.body.rating)
-    
     const userRef = doc(db, "users", investigatorId)
-    let userRatings = []
 
     try {
-        const docSnap = await getDoc(userRef);
-
-        if (docSnap.exists()) {
-            userRatings = docSnap.data().userRatings
-        }
-        try {
-            await updateDoc(userRef, {
-                userRatings: [...userRatings, rating]
-            })
-            res.json({message: "UPDATE SUCCESS"})
-        } catch (error) {
-            res.json({error: error})
-        }
+        await updateDoc(userRef, {
+            userRatings: arrayUnion(rating)
+        })
+        res.json({message: "UPDATE SUCCESS"})
     } catch (error) {
         res.json({error: error})
     }
