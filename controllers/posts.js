@@ -115,7 +115,9 @@ export const createPost = async (req, res) => {
                         author_profile_image_url: profile_image_url,
                         user_vote_real: [],
                         user_vote_fake: [],
+                        investigator_ids: [],
                         investigator_info: [],
+                        jury_ids: [],
                         jury_info: [],
                         user_uploads: [uid],
                     };
