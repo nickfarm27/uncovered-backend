@@ -12,6 +12,7 @@ import {
     where,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { calculateTrustIndex } from "../utils/trustIndex.js";
 
 export const getVerifiedPosts = async (req, res) => {
     try {
@@ -83,7 +84,6 @@ export const createPost = async (req, res) => {
     try {
         const postRef = doc(db, "posts", tweetId);
         const docSnap = await getDoc(postRef);
-        const userRef = doc(db, "users", uid)
 
         if (docSnap.exists()) {
             console.log("Document data:", docSnap.data());
@@ -104,6 +104,7 @@ export const createPost = async (req, res) => {
                 if (tweetData.data) {
                     const { id, text, created_at, author_id } = tweetData.data;
                     const { name, username, profile_image_url } = tweetData.includes.users[0];
+                    const authorRef = doc(db, "authors", author_id)
                     const data = {
                         tweet_id: id,
                         text: text,
@@ -122,9 +123,25 @@ export const createPost = async (req, res) => {
                         user_uploads: [uid],
                     };
 
-                    // TODO: add author data - if present, just add post, if not, add new author data
-
                     try {
+                        // TODO: add author data - if present, just add post, if not, add new author data
+                        const docAuthorSnap = await getDoc(authorRef);
+                        if (docAuthorSnap.exists()) {
+                            console.log("Author data:", docAuthorSnap.data());
+                            await updateDoc(authorRef, {
+                                no_of_posts: increment(1)
+                            })
+                        } else {
+                            await setDoc(authorRef, {
+                                author_id: author_id,
+                                author_name: name,
+                                author_username: username,
+                                author_profile_image_url: profile_image_url,
+                                author_rating: 50,
+                                no_of_posts: 1,
+                                trust_index_scores: []
+                            })
+                        }
                         await setDoc(postRef, data);
                         res.json({ data: data });
                     } catch (error) {
@@ -191,10 +208,12 @@ export const addJuryReview = async (req, res) => {
             numberOfVerifiedNews: increment(1)
         })
         if (Number(juryCount) === 4) {
-            // TODO: calculate trust index
-
-
-            // TODO: update author's info
+            //? calculate trust index and update author's info
+            try {
+                await calculateTrustIndex(pid)
+            } catch (error) {
+                console.log("Calculate trust index error");
+            }
         }
         res.json({message: "ADDED JURY REVIEW TO DATABASE"})
     } catch (error) {
