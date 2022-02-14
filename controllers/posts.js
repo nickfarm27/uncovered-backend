@@ -197,12 +197,11 @@ export const addJuryReview = async (req, res) => {
 
 export const addUserVote = async (req, res) => {
     const { pid, uid, vote } = req.body
-    const voteType = (vote === "true")
-    console.log(voteType);
+    console.log(vote);
 
     const postRef = doc(db, "posts", pid)
     try {
-        if (voteType) {
+        if (vote) {
             await updateDoc(postRef, {
                 user_vote_real: arrayUnion(uid)
             })
