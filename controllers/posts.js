@@ -141,14 +141,16 @@ export const createPost = async (req, res) => {
 };
 
 export const addInvestigatorResearch = async (req, res) => {
-    const { pid, uid, userRating, researchText, vote } = req.body
+    const { pid, uid, username, userRating, researchText, vote } = req.body
     const postRef = doc(db, "posts", pid)
     const userRef = doc(db, "users", uid)
 
     try {
         await updateDoc(postRef, {
+            investigator_ids: arrayUnion(uid),
             investigator_info: arrayUnion({
                 uid: uid,
+                username: username,
                 userRating: Number(userRating),
                 researchText: researchText,
                 vote: (vote === "true")
@@ -164,7 +166,7 @@ export const addInvestigatorResearch = async (req, res) => {
 }
 
 export const addJuryReview = async (req, res) => {
-    const { pid, uid, userRating, researchText, grade } = req.body
+    const { pid, uid, username, userRating, researchText, grade } = req.body
     const newGrade = Number(grade) * 2 - 100
 
     const postRef = doc(db, "posts", pid)
@@ -172,8 +174,10 @@ export const addJuryReview = async (req, res) => {
 
     try {
         await updateDoc(postRef, {
+            jury_ids: arrayUnion(uid),
             jury_info: arrayUnion({
                 uid: uid,
+                username: username,
                 userRating: Number(userRating),
                 researchText: researchText,
                 grade: newGrade,
