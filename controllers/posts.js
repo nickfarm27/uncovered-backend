@@ -71,7 +71,7 @@ export const getSinglePost = async (req, res) => {
 export const createPost = async (req, res) => {
     const uid = req.body.uid
     const url = req.body.url;
-    const tweetId = url.split("/").pop();
+    const tweetId = url.split("/").pop().split("?")[0];
 
     const config = {
         headers: {
