@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { createNewUser, getUserInfo, rateUser, upgradeToInvestigator, upgradeToJury } from '../controllers/users.js';
+import { createNewUser, getAuthorInfo, getUserInfo, rateUser, upgradeToInvestigator, upgradeToJury } from '../controllers/users.js';
 
 const router = express.Router();
 
@@ -9,5 +9,6 @@ router.post('/upgrade/investigator', upgradeToInvestigator)
 router.post('/upgrade/jury', upgradeToJury)
 router.post('/rate', rateUser)
 router.get('/:uid', getUserInfo);
+router.get('/author/:aid', getAuthorInfo)
 
 export default router;

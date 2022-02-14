@@ -19,6 +19,23 @@ export const getUserInfo = async (req, res) => {
     }
 }
 
+export const getAuthorInfo = async (req, res) => {
+    const aid = req.params.aid
+
+    try {
+        const authorRef = doc(db, "authors", aid);
+        const docSnap = await getDoc(authorRef);
+
+        if (docSnap.exists()) {
+            res.json({author: docSnap.data()})
+        } else {
+            res.json({message: "No author found"})
+        }
+    } catch (error) {
+        res.json({error: error})
+    }
+}
+
 export const createNewUser = async (req, res) => {
     const email = req.body.email
     const username = req.body.username
