@@ -241,3 +241,21 @@ export const addUserVote = async (req, res) => {
         res.json({error: error})
     }
 }
+
+export const getPostsByUserId = async (req, res) => {
+    const { uid } = req.params
+
+    try {
+        const postsRef = collection(db, "posts");
+        const q = query(postsRef, where("user_uploads", "array-contains", uid));
+        const querySnapshot = await getDocs(q);
+
+        let postsList = [];
+        querySnapshot.forEach((post) => {
+            postsList.push(post.data());
+        });
+        res.json({ data: postsList });
+    } catch (error) {
+        res.json({ error: error });
+    }
+};
