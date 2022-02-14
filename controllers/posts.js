@@ -212,7 +212,7 @@ export const addJuryReview = async (req, res) => {
             try {
                 await calculateTrustIndex(pid)
             } catch (error) {
-                console.log("Calculate trust index error");
+                console.log(error);
             }
         }
         res.json({message: "ADDED JURY REVIEW TO DATABASE"})
