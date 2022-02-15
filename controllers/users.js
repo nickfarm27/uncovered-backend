@@ -113,6 +113,26 @@ export const rateUser = async (req, res) => {
     }
 }
 
+export const updateJuryRatingDone = async (req, res) => {
+    const { pid, uid } = req.body
+    const postRef = (db, "posts", pid)
+
+    try {
+        const postSnap = await getDoc(postRef);
+        const { jury_info: juryInfoList } = postSnap.data()
+
+        const juryIndex = juryInfoList.findIndex((juryInfo => juryInfo.uid === uid));
+        juryInfoList[juryIndex].ratingDone = true;
+
+        console.log("Updating Jury Rating Check");
+        await updateDoc(postRef, {
+            jury_info: juryInfoList
+        })
+    } catch (error) {
+        res.json({ error: error, message: "UPDATE JURY RATING ERROR" })
+    }
+}
+
 export const getLeaderboardData = async (req, res) => {
     try {
         const usersRef = collection(db, "users");

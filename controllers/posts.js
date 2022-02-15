@@ -12,6 +12,7 @@ import {
     where,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { transferCoins, uploadDataToBlockchain } from "../utils/blockchain.js";
 import { calculateTrustIndex } from "../utils/trustIndex.js";
 
 export const getVerifiedPosts = async (req, res) => {
@@ -160,7 +161,7 @@ export const createPost = async (req, res) => {
 };
 
 export const addInvestigatorResearch = async (req, res) => {
-    const { pid, uid, username, userRating, researchText, vote } = req.body
+    const { pid, uid, username, userRating, researchText, vote, userPublicKey, invClass } = req.body
     const postRef = doc(db, "posts", pid)
     const userRef = doc(db, "users", uid)
 
@@ -175,9 +176,13 @@ export const addInvestigatorResearch = async (req, res) => {
                 vote: vote
             })
         })
+        const expMultiplier = invClass === "CAPTAIN" ? 1.15 : "WIZARD" ? 1.075 : 1
         await updateDoc(userRef, {
-            numberOfVerifiedNews: increment(1)
+            numberOfVerifiedNews: increment(1),
+            experiencePoints: increment(1000 * expMultiplier)
         })
+        const coinsMultipler = invClass === "WARRIOR" ? 1.15 : "WIZARD" ? 1.075 : 1
+        transferCoins(userPublicKey, 300 * coinsMultipler)
         res.json({message: "ADDED INVESTIGATOR RESEARCH TO DATABASE"})
     } catch (error) {
         res.json({error: error})
@@ -185,7 +190,7 @@ export const addInvestigatorResearch = async (req, res) => {
 }
 
 export const addJuryReview = async (req, res) => {
-    const { pid, uid, username, userRating, researchText, grade, juryCount } = req.body
+    const { pid, uid, username, userRating, researchText, grade, juryCount, userPublicKey, invClass } = req.body
     const newGrade = Number(grade) * 2 - 100
 
     const postRef = doc(db, "posts", pid)
@@ -204,17 +209,39 @@ export const addJuryReview = async (req, res) => {
             }),
             verified: (Number(juryCount) === 4)
         })
+        const expMultiplier = invClass === "CAPTAIN" ? 1.15 : "WIZARD" ? 1.075 : 1
         await updateDoc(userRef, {
-            numberOfVerifiedNews: increment(1)
+            numberOfVerifiedNews: increment(1),
+            experiencePoints: increment(2000 * expMultiplier)
         })
         if (Number(juryCount) === 4) {
             //? calculate trust index and update author's info
             try {
                 await calculateTrustIndex(pid)
+                const postSnap = await getDoc(postRef);
+                
+                const { author_id, author_multiplier, author_name, author_rating, author_username, combined_score, investigator_score, jury_score, normal_user_score, tweet_id } = postSnap.data()
+
+                const data = {
+                    authourId: author_id, 
+                    authorMultiplier: author_multiplier, 
+                    authorName: author_name, 
+                    authorRating: author_rating, 
+                    authorUsername: author_username, 
+                    combinedScore: combined_score, 
+                    investigatorScore: investigator_score, 
+                    juryScore: jury_score, 
+                    normalUserScore: normal_user_score, 
+                    tweetId: tweet_id
+                }
+
+                uploadDataToBlockchain(data)
             } catch (error) {
                 console.log(error);
             }
         }
+        const coinsMultipler = invClass === "WARRIOR" ? 1.15 : "WIZARD" ? 1.075 : 1
+        transferCoins(userPublicKey, 500 * coinsMultipler)
         res.json({message: "ADDED JURY REVIEW TO DATABASE"})
     } catch (error) {
         res.json({error: error})
@@ -222,20 +249,23 @@ export const addJuryReview = async (req, res) => {
 }
 
 export const addUserVote = async (req, res) => {
-    const { pid, uid, vote } = req.body
+    const { pid, uid, vote, userPublicKey } = req.body
     console.log(vote);
 
     const postRef = doc(db, "posts", pid)
     try {
         if (vote) {
             await updateDoc(postRef, {
-                user_vote_real: arrayUnion(uid)
+                user_vote_real: arrayUnion(uid),
+                experiencePoints: increment(50)
             })
         } else {
             await updateDoc(postRef, {
-                user_vote_fake: arrayUnion(uid)
+                user_vote_fake: arrayUnion(uid),
+                experiencePoints: increment(50)
             })
         }
+        transferCoins(userPublicKey, 30)
         res.json({message: `VOTED ${vote} for the post`})
     } catch (error) {
         res.json({error: error})

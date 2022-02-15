@@ -7,14 +7,14 @@ const sender = Account.createFromPrivateKey(
 
 const recipient = Account.createFromPrivateKey(
     // '795C61F2C5DCAD347F3B42FA1185B32162D8064B3FDBCEB2D081FD813516F9EC',
-    'B1A70594B121B7D0E08680E701C8DF66593666EE4AA3D003056E8103ACCB9094',
+    '0B42CBFBADF4A7100FFA2CD476FC4222FDF0A805A0F54F0469DCD33293486F34',
 NetworkType.TEST_NET).publicAccount;
 
 const tx = TransferTransaction.create(
     Deadline.create(),
     recipient.address,
-    [NetworkCurrencyMosaic.createRelative(1)],
-    PlainMessage.create('Send to myself can?'),
+    [NetworkCurrencyMosaic.createRelative(6969)],
+    PlainMessage.create('69696969 420 YAAAAAAAAA'),
     NetworkType.TEST_NET
 );
 
