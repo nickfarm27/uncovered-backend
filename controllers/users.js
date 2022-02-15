@@ -1,4 +1,4 @@
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, getDocs, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { generateKeys } from "../utils/blockchain.js";
 
@@ -112,3 +112,19 @@ export const rateUser = async (req, res) => {
         res.json({error: error})
     }
 }
+
+export const getLeaderboardData = async (req, res) => {
+    try {
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, orderBy("numberOfVerifiedNews", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        let usersList = [];
+        querySnapshot.forEach((user) => {
+            usersList.push(user.data());
+        });
+        res.json({ data: usersList });
+    } catch (error) {
+        res.json({ error: error });
+    }
+};
