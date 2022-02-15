@@ -179,7 +179,7 @@ export const addInvestigatorResearch = async (req, res) => {
         const expMultiplier = invClass === "CAPTAIN" ? 1.15 : "WIZARD" ? 1.075 : 1
         await updateDoc(userRef, {
             numberOfVerifiedNews: increment(1),
-            experiencePoints: increment(1000 * expMultiplier)
+            experiencePoints: increment(40 * expMultiplier)
         })
         const coinsMultipler = invClass === "WARRIOR" ? 1.15 : "WIZARD" ? 1.075 : 1
         transferCoins(userPublicKey, 300 * coinsMultipler)
@@ -212,7 +212,7 @@ export const addJuryReview = async (req, res) => {
         const expMultiplier = invClass === "CAPTAIN" ? 1.15 : "WIZARD" ? 1.075 : 1
         await updateDoc(userRef, {
             numberOfVerifiedNews: increment(1),
-            experiencePoints: increment(2000 * expMultiplier)
+            experiencePoints: increment(50 * expMultiplier)
         })
         if (Number(juryCount) === 4) {
             //? calculate trust index and update author's info
@@ -253,18 +253,20 @@ export const addUserVote = async (req, res) => {
     console.log(vote);
 
     const postRef = doc(db, "posts", pid)
+    const userRef = doc(db, "users", uid)
     try {
         if (vote) {
             await updateDoc(postRef, {
                 user_vote_real: arrayUnion(uid),
-                experiencePoints: increment(50)
             })
         } else {
             await updateDoc(postRef, {
                 user_vote_fake: arrayUnion(uid),
-                experiencePoints: increment(50)
             })
         }
+        await updateDoc(userRef, {
+            experiencePoints: increment(10)
+        })
         transferCoins(userPublicKey, 30)
         res.json({message: `VOTED ${vote} for the post`})
     } catch (error) {
